@@ -171,9 +171,10 @@ def main():
     while True:
         try:
             client.connect((args.server, args.port))
+            print('Connected to host')
             break
         except Exception:
-            print('Waiting for host to start')
+            print('Waiting for server %s:%d to start' % (args.server, args.port))
             sleep(1)
 
     # Start the client thread
