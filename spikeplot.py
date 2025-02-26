@@ -47,6 +47,8 @@ def threadfun(client, fig, spiketrains, n_neurons):
         for s in spiketrains:
             s['count'] = counts[s['index']]
 
+        sleep(.001) # yield
+
 
 def animfun(frame, spiketrains, ticks, showcounts):
 
