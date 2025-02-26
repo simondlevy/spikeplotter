@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 
 '''
+Spike-raster plotting program
+
 Copyright (C) 2025 Simon D. Levy
 
 This program is free software: you can redistribute it and/or modify
@@ -47,7 +49,7 @@ def threadfun(client, fig, spiketrains, n_neurons):
         for s in spiketrains:
             s['count'] = counts[s['index']]
 
-        sleep(.001) # yield
+        sleep(.001)  # yield
 
 
 def animfun(frame, spiketrains, ticks, showcounts):
@@ -176,7 +178,8 @@ def main():
             print('Connected to server')
             break
         except Exception:
-            print('Waiting for server %s:%d to start' % (args.server, args.port))
+            print('Waiting for server %s:%d to start' %
+                  (args.server, args.port))
             sleep(1)
 
     # Start the client thread
