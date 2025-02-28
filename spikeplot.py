@@ -120,8 +120,8 @@ def main():
                        help='Name of JSON-formatted network file to load')
     group.add_argument('-n', '--neuron-count', type=int,
                        help='Number of neurons')
-    parser.add_argument('-s', '--server', help='server', default='localhost')
-    parser.add_argument('-p', '--port', help='port', type=int, default=8100)
+    parser.add_argument('-a', '--address', help='address (IP or MAC)')
+    parser.add_argument('-p', '--port', help='port', type=int)
     parser.add_argument('-i', '--ids', help='neuron ids', default='all')
     parser.add_argument('-v', '--video', help='video file to save',
                         default=None)
@@ -170,16 +170,21 @@ def main():
     # Create timestep count, to be shared between threads
     ticks = [0]
 
+    # Create a Bluetooth or IP socket depending on address format
+    client = (socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM,
+              socket.BTPROTO_RFCOMM)
+              if ':' in args.address
+              else socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+
     # Attempt to connect to the server until connection is made
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
-            client.connect((args.server, args.port))
+            client.connect((args.address, args.port))
             print('Connected to server')
             break
         except Exception:
             print('Waiting for server %s:%d to start' %
-                  (args.server, args.port))
+                  (args.address, args.port))
             sleep(1)
 
     # Start the client thread
