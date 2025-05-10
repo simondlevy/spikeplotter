@@ -120,8 +120,9 @@ def main():
                        help='Name of JSON-formatted network file to load')
     group.add_argument('-n', '--neuron-count', type=int,
                        help='Number of neurons')
-    parser.add_argument('-a', '--address', help='address (IP or MAC)')
-    parser.add_argument('-p', '--port', help='port', type=int)
+    parser.add_argument('-a', '--address', help='address (IP or MAC)',
+                        required=True)
+    parser.add_argument('-p', '--port', help='port', type=int, required=True)
     parser.add_argument('-i', '--ids', help='neuron ids', default='all')
     parser.add_argument('-v', '--video', help='video file to save',
                         default=None)
