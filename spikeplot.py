@@ -29,7 +29,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 
-def threadfun(client, fig, spiketrains, n_neurons):
+def threadfun(client, fig, spiketrains, n_neurons, connected):
 
     while True:
 
@@ -41,18 +41,16 @@ def threadfun(client, fig, spiketrains, n_neurons):
 
         counts = [count for count in msg]
 
-        # Close plot on server quit
-        if len(counts) == 0:
-            plt.close(fig)
-            break
-
-        for s in spiketrains:
-            s['count'] = counts[s['index']]
+        if len(counts) > 0:
+            for s in spiketrains:
+                s['count'] = counts[s['index']]
+        else:
+            connected[0] = False
 
         sleep(.001)  # yield
 
 
-def animfun(frame, spiketrains, ticks, showcounts):
+def animfun(frame, spiketrains, ticks, showcounts, connected):
 
     for spiketrain in spiketrains:
 
@@ -64,7 +62,7 @@ def animfun(frame, spiketrains, ticks, showcounts):
                                     loc='lower left',
                                     bbox_to_anchor=(0.01, 0.005))
 
-        if count > 0:
+        if connected[0] and count > 0:
 
             period = int(np.round(100 / count))
 
@@ -188,17 +186,19 @@ def main():
                   (args.address, args.port))
             sleep(1)
 
+    connected = [True]
+
     # Start the client thread
     thread = threading.Thread(
             target=threadfun,
-            args=(client, fig, spiketrains, len(neuron_aliases)))
+            args=(client, fig, spiketrains, len(neuron_aliases), connected))
     thread.start()
 
     # Star the animation thread
     ani = animation.FuncAnimation(
             fig=fig,
             func=animfun,
-            fargs=(spiketrains, ticks, args.display_counts),
+            fargs=(spiketrains, ticks, args.display_counts, connected),
             cache_frame_data=False,
             interval=1)
 
