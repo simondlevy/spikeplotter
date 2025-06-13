@@ -124,7 +124,9 @@ def main():
     parser.add_argument('-i', '--ids', help='neuron ids', default='all')
     parser.add_argument('-v', '--video', help='video file to save',
                         default=None)
-    parser.add_argument('-d', '--display-counts', help='display counts',
+    parser.add_argument('-d', '--display-values', help='display values',
+                        action='store_true')
+    parser.add_argument('-r', '--rates', help='treat values as rates',
                         action='store_true')
     args = parser.parse_args()
 
@@ -198,7 +200,7 @@ def main():
     ani = animation.FuncAnimation(
             fig=fig,
             func=animfun,
-            fargs=(spiketrains, ticks, args.display_counts, connected),
+            fargs=(spiketrains, ticks, args.display_values, connected),
             cache_frame_data=False,
             interval=1)
 
