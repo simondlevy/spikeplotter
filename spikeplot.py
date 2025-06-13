@@ -131,6 +131,8 @@ def main():
                         default=None)
     parser.add_argument('-d', '--display-values', help='display values',
                         action='store_true')
+    group.add_argument('-t', '--time', type=int, default=1000,
+                       help='Time span in milliseconds')
     args = parser.parse_args()
 
     neuron_aliases = (load_neuron_aliases(args.filename)
