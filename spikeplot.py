@@ -131,8 +131,6 @@ def main():
                         default=None)
     parser.add_argument('-d', '--display-values', help='display values',
                         action='store_true')
-    parser.add_argument('-r', '--rates', help='treat values as rates',
-                        action='store_true')
     args = parser.parse_args()
 
     neuron_aliases = (load_neuron_aliases(args.filename)
