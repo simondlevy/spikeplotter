@@ -129,7 +129,7 @@ def main():
     parser.add_argument('-i', '--ids', help='neuron ids', default='all')
     parser.add_argument('-v', '--video', help='video file to save',
                         default=None)
-    parser.add_argument('-d', '--display-values', help='display values',
+    parser.add_argument('-d', '--display-counts', help='display counts',
                         action='store_true')
     parser.add_argument('-t', '--time', type=int, default=1000,
                        help='Time span in milliseconds')
@@ -205,7 +205,7 @@ def main():
     ani = animation.FuncAnimation(
             fig=fig,
             func=animfun,
-            fargs=(spiketrains, ticks, args.display_values, connected, args.time),
+            fargs=(spiketrains, ticks, args.display_counts, connected, args.time),
             cache_frame_data=False,
             interval=1)
 
