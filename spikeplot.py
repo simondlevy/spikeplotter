@@ -68,7 +68,8 @@ def animfun(frame, spiketrains, ticks, showvals, connected):
 
             lines = spiketrain['lines']
 
-            # If spikes are coming faster than we can plot them, use a thick line
+            # If spikes are coming faster than we can plot them, use a thick
+            # line
             lw = 20 if period == 0 else 1
 
             # Otherwise add a new line periodically
