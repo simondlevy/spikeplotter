@@ -31,7 +31,7 @@ while True:
 
     try:
 
-        conn.send(bytes([30, 40]))
+        conn.send(bytes([30, 40, 200]))
 
     except Exception:
 

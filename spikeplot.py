@@ -68,8 +68,12 @@ def animfun(frame, spiketrains, ticks, showvals, connected):
 
             lines = spiketrain['lines']
 
-            # Add a new spike periodically
-            if ticks[0] % period == 0:
+            # If spikes are coming faster than we can plot them, use a thick line
+            if period == 0:
+                lines.append(spiketrain['ax'].plot((100, 100), (0, 1), 'k', linewidth=10))
+
+            # Otherwise add a new line periodically
+            elif ticks[0] % period == 0:
                 lines.append(spiketrain['ax'].plot((100, 100), (0, 1), 'k'))
 
             # Prune spikes as the move left outside the window
