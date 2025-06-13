@@ -50,14 +50,14 @@ def threadfun(client, fig, spiketrains, n_neurons, connected):
         sleep(.001)  # yield
 
 
-def animfun(frame, spiketrains, ticks, showcounts, connected):
+def animfun(frame, spiketrains, ticks, showvals, connected):
 
     for spiketrain in spiketrains:
 
         count = spiketrain['count']
 
         # Add count as a legend if indicated
-        if showcounts:
+        if showvals:
             spiketrain['ax'].legend(['%d' % count], handlelength=0,
                                     loc='lower left',
                                     bbox_to_anchor=(0.01, 0.005))
