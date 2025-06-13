@@ -50,7 +50,7 @@ def threadfun(client, fig, spiketrains, n_neurons, connected):
         sleep(.001)  # yield
 
 
-def animfun(frame, spiketrains, ticks, showvals, connected):
+def animfun(frame, spiketrains, ticks, showvals, connected, time):
 
     for spiketrain in spiketrains:
 
@@ -92,7 +92,7 @@ def animfun(frame, spiketrains, ticks, showvals, connected):
     sleep(0.01)
 
 
-def make_axis(ax, neuron_ids, index, is_last):
+def make_axis(ax, neuron_ids, index, is_last, time):
 
     ax.set_ylim((0, 1.1))
     ax.set_xlim((0, 100))
@@ -101,7 +101,7 @@ def make_axis(ax, neuron_ids, index, is_last):
     ax.set_yticks([])
 
     if is_last:
-        ax.set_xlabel('1 sec')
+        ax.set_xlabel('%d msec' % time)
 
 
 def load_neuron_aliases(filename):
@@ -158,7 +158,7 @@ def main():
 
         for k, ax in enumerate(axes):
 
-            make_axis(ax, neuron_ids, k, k == len(axes)-1)
+            make_axis(ax, neuron_ids, k, k == len(axes)-1, args.time)
 
         # Make list of spike-train info
         spiketrains = [{'ax': ax, 'lines': [], 'count': 0,
@@ -205,7 +205,7 @@ def main():
     ani = animation.FuncAnimation(
             fig=fig,
             func=animfun,
-            fargs=(spiketrains, ticks, args.display_values, connected),
+            fargs=(spiketrains, ticks, args.display_values, connected, args.time),
             cache_frame_data=False,
             interval=1)
 
