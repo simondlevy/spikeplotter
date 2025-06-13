@@ -64,7 +64,8 @@ def animfun(frame, spiketrains, ticks, showvals, connected, time):
 
         if connected[0] and count > 0:
 
-            period = int(np.round(100 / count))
+            # period = int(np.round(100 / count))
+            period = int(np.round((100000/time) / count))
 
             lines = spiketrain['lines']
 
@@ -131,7 +132,7 @@ def main():
                         default=None)
     parser.add_argument('-d', '--display-values', help='display values',
                         action='store_true')
-    group.add_argument('-t', '--time', type=int, default=1000,
+    parser.add_argument('-t', '--time', type=int, default=1000,
                        help='Time span in milliseconds')
     args = parser.parse_args()
 
