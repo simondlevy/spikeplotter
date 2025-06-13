@@ -64,7 +64,6 @@ def animfun(frame, spiketrains, ticks, showvals, connected, time):
 
         if connected[0] and count > 0:
 
-            # period = int(np.round(100 / count))
             period = int(np.round((100000/time) / count))
 
             lines = spiketrain['lines']
