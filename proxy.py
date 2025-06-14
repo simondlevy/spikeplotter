@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import socket
+from struct import pack
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -31,7 +32,7 @@ while True:
 
     try:
 
-        conn.send(bytes([30, 40, 200]))
+        conn.send(pack('III', 30, 40, 200))
 
     except Exception:
 

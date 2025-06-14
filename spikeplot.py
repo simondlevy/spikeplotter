@@ -19,10 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from sys import stdout
+from struct import unpack
 import socket
 from time import sleep
 import threading
-import json
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,20 +37,18 @@ def threadfun(client, fig, spiketrains, n_neurons, connected):
         if not plt.fignum_exists(fig.number):
             break
 
-        msg = client.recv(n_neurons)
-
-        counts = [count for count in msg]
+        counts = unpack('I'*n_neurons, client.recv(4*n_neurons))
 
         if len(counts) > 0:
-            for s in spiketrains:
-                s['count'] = counts[s['index']]
+            for k,s in enumerate(spiketrains):
+                s['count'] = counts[k]
         else:
             connected[0] = False
 
         sleep(.001)  # yield
 
 
-def animfun(frame, spiketrains, ticks, showvals, connected, time):
+def animfun(frame, spiketrains, ticks, showvals, connected):
 
     for spiketrain in spiketrains:
 
@@ -64,7 +62,7 @@ def animfun(frame, spiketrains, ticks, showvals, connected, time):
 
         if connected[0] and count > 0:
 
-            period = int(np.round((100000/time) / count))
+            period = int(np.round(100 / count))
 
             lines = spiketrain['lines']
 
@@ -92,7 +90,7 @@ def animfun(frame, spiketrains, ticks, showvals, connected, time):
     sleep(0.01)
 
 
-def make_axis(ax, neuron_ids, index, is_last, time):
+def make_axis(ax, neuron_ids, index, is_last):
 
     ax.set_ylim((0, 1.1))
     ax.set_xlim((0, 100))
@@ -101,16 +99,7 @@ def make_axis(ax, neuron_ids, index, is_last, time):
     ax.set_yticks([])
 
     if is_last:
-        ax.set_xlabel('%d msec' % time)
-
-
-def load_neuron_aliases(filename):
-
-    # Load network from JSON file
-    network = json.loads(open(filename).read())
-
-    # Get neuron aliases by sorting node ids from network JSON
-    return sorted([int(node['id']) for node in network['Nodes']])
+        ax.set_xlabel('1 sec')
 
 
 def main():
@@ -118,37 +107,18 @@ def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-f', '--filename',
-                       help='Name of JSON-formatted network file to load')
-    group.add_argument('-n', '--neuron-count', type=int,
-                       help='Number of neurons')
     parser.add_argument('-a', '--address', help='address (IP or MAC)',
                         required=True)
     parser.add_argument('-p', '--port', help='port', type=int, required=True)
-    parser.add_argument('-i', '--ids', help='neuron ids', default='all')
+    parser.add_argument('-i', '--ids', help='neuron ids')
     parser.add_argument('-v', '--video', help='video file to save',
                         default=None)
     parser.add_argument('-d', '--display-counts', help='display counts',
                         action='store_true')
-    parser.add_argument('-t', '--time', type=int, default=1000,
-                       help='Time span in milliseconds')
     args = parser.parse_args()
 
-    neuron_aliases = (load_neuron_aliases(args.filename)
-                      if args.filename is not None
-                      else list(range(args.neuron_count)))
-
     # Get desired neuron IDs to plot from command line
-    neuron_ids = (neuron_aliases
-                  if args.ids == 'all'
-                  else list(map(int, args.ids.strip().split(','))))
-
-    # Bozo filter
-    for neuron_id in neuron_ids:
-        if neuron_id not in neuron_aliases:
-            print('Neuron %d not in network; quitting' % neuron_id)
-            exit(1)
+    neuron_ids = args.ids.strip().split(',')
 
     # Create figure and axes in which to plot spike trains
     fig, axes = plt.subplots(len(neuron_ids))
@@ -158,11 +128,10 @@ def main():
 
         for k, ax in enumerate(axes):
 
-            make_axis(ax, neuron_ids, k, k == len(axes)-1, args.time)
+            make_axis(ax, neuron_ids, k, k == len(axes)-1)
 
         # Make list of spike-train info
-        spiketrains = [{'ax': ax, 'lines': [], 'count': 0,
-                        'index': neuron_aliases.index(nid)}
+        spiketrains = [{'ax': ax, 'lines': [], 'count': 0}
                        for ax, nid in zip(axes, neuron_ids)]
 
     # Just one neuron
@@ -170,8 +139,7 @@ def main():
 
         make_axis(axes, neuron_ids, 0, True)
 
-        spiketrains = [{'ax': axes, 'lines': [], 'count': 0,
-                        'index': neuron_aliases.index(neuron_ids[0])}]
+        spiketrains = [{'ax': axes, 'lines': [], 'count': 0}]
 
     # Create timestep count, to be shared between threads
     ticks = [0]
@@ -198,14 +166,14 @@ def main():
     # Start the client thread
     thread = threading.Thread(
             target=threadfun,
-            args=(client, fig, spiketrains, len(neuron_aliases), connected))
+            args=(client, fig, spiketrains, len(neuron_ids), connected))
     thread.start()
 
     # Star the animation thread
     ani = animation.FuncAnimation(
             fig=fig,
             func=animfun,
-            fargs=(spiketrains, ticks, args.display_counts, connected, args.time),
+            fargs=(spiketrains, ticks, args.display_counts, connected),
             cache_frame_data=False,
             interval=1)
 

@@ -15,4 +15,4 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 python3 proxy.py &
-python3 spikeplot.py -a localhost -p 5000 -n 3 -d # -t 500
+python3 spikeplot.py -a localhost -p 5000 -i 'n1,n2,n3' -d 
