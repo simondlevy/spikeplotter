@@ -29,7 +29,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 
-def threadfun(client, fig, spiketrains, n_neurons, connected):
+def threadfun(client, fig, spiketrains, n_neurons, connected, logarithmic):
 
     while True:
 
@@ -48,15 +48,18 @@ def threadfun(client, fig, spiketrains, n_neurons, connected):
         sleep(.001)  # yield
 
 
-def animfun(frame, spiketrains, ticks, showvals, connected, time):
+def animfun(frame, spiketrains, ticks, showvals, connected, logarithmic,
+            time):
 
     for spiketrain in spiketrains:
 
-        count = spiketrain['count']
+        rawcount = spiketrain['count'] 
+
+        count = np.log(rawcount+1) if logarithmic else rawcount
 
         # Add count as a legend if indicated
         if showvals:
-            spiketrain['ax'].legend(['%d' % count], handlelength=0,
+            spiketrain['ax'].legend(['%d' % rawcount], handlelength=0,
                                     loc='lower left',
                                     bbox_to_anchor=(0.01, 0.005))
 
@@ -90,11 +93,12 @@ def animfun(frame, spiketrains, ticks, showvals, connected, time):
     sleep(0.01)
 
 
-def make_axis(ax, neuron_ids, index, is_last, time):
+def make_axis(ax, neuron_ids, index, time, logarithmic, is_last):
 
     ax.set_ylim((0, 1.1))
     ax.set_xlim((0, 100))
-    ax.set_ylabel(neuron_ids[index])
+    nid = neuron_ids[index]
+    ax.set_ylabel('log(%s)' % nid if logarithmic else nid)
     ax.set_xticks([])
     ax.set_yticks([])
 
@@ -115,6 +119,8 @@ def main():
                         default=None)
     parser.add_argument('-d', '--display-counts', help='display counts',
                         action='store_true')
+    parser.add_argument('-l', '--logarithmic', help='use logarithm of counts',
+                        action='store_true')
     parser.add_argument('-t', '--time', type=int, default=1000,
                         help='Time span in milliseconds')
     args = parser.parse_args()
@@ -130,7 +136,8 @@ def main():
 
         for k, ax in enumerate(axes):
 
-            make_axis(ax, neuron_ids, k, k == len(axes)-1, args.time)
+            make_axis(ax, neuron_ids, k, args.time, args.logarithmic,
+                      k == len(axes)-1)
 
         # Make list of spike-train info
         spiketrains = [{'ax': ax, 'lines': [], 'count': 0}
@@ -139,7 +146,7 @@ def main():
     # Just one neuron
     else:
 
-        make_axis(axes, neuron_ids, 0, True)
+        make_axis(axes, neuron_ids, 0, args.logarithmic, True)
 
         spiketrains = [{'ax': axes, 'lines': [], 'count': 0}]
 
@@ -168,7 +175,8 @@ def main():
     # Start the client thread
     thread = threading.Thread(
             target=threadfun,
-            args=(client, fig, spiketrains, len(neuron_ids), connected))
+            args=(client, fig, spiketrains, len(neuron_ids), connected,
+                  args.logarithmic))
     thread.start()
 
     # Star the animation thread
@@ -176,7 +184,7 @@ def main():
             fig=fig,
             func=animfun,
             fargs=(spiketrains, ticks, args.display_counts, connected,
-                   args.time),
+                   args.logarithmic, args.time),
             cache_frame_data=False,
             interval=1)
 
