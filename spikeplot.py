@@ -48,7 +48,7 @@ def threadfun(client, fig, spiketrains, n_neurons, connected):
         sleep(.001)  # yield
 
 
-def animfun(frame, spiketrains, ticks, showvals, connected):
+def animfun(frame, spiketrains, ticks, showvals, connected, time):
 
     for spiketrain in spiketrains:
 
@@ -62,7 +62,7 @@ def animfun(frame, spiketrains, ticks, showvals, connected):
 
         if connected[0] and count > 0:
 
-            period = int(np.round(100 / count))
+            period = int(np.round((100000/time) / count))
 
             lines = spiketrain['lines']
 
@@ -90,7 +90,7 @@ def animfun(frame, spiketrains, ticks, showvals, connected):
     sleep(0.01)
 
 
-def make_axis(ax, neuron_ids, index, is_last):
+def make_axis(ax, neuron_ids, index, is_last, time):
 
     ax.set_ylim((0, 1.1))
     ax.set_xlim((0, 100))
@@ -99,7 +99,7 @@ def make_axis(ax, neuron_ids, index, is_last):
     ax.set_yticks([])
 
     if is_last:
-        ax.set_xlabel('1 sec')
+        ax.set_xlabel('%d msec' % time)
 
 
 def main():
@@ -115,6 +115,8 @@ def main():
                         default=None)
     parser.add_argument('-d', '--display-counts', help='display counts',
                         action='store_true')
+    parser.add_argument('-t', '--time', type=int, default=1000,
+                        help='Time span in milliseconds')
     args = parser.parse_args()
 
     # Get desired neuron IDs to plot from command line
@@ -128,7 +130,7 @@ def main():
 
         for k, ax in enumerate(axes):
 
-            make_axis(ax, neuron_ids, k, k == len(axes)-1)
+            make_axis(ax, neuron_ids, k, k == len(axes)-1, args.time)
 
         # Make list of spike-train info
         spiketrains = [{'ax': ax, 'lines': [], 'count': 0}
@@ -173,7 +175,8 @@ def main():
     ani = animation.FuncAnimation(
             fig=fig,
             func=animfun,
-            fargs=(spiketrains, ticks, args.display_counts, connected),
+            fargs=(spiketrains, ticks, args.display_counts, connected,
+                   args.time),
             cache_frame_data=False,
             interval=1)
 
