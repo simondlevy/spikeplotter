@@ -117,7 +117,7 @@ def main():
     parser.add_argument('-i', '--ids', help='neuron ids')
     parser.add_argument('-v', '--video', help='video file to save',
                         default=None)
-    parser.add_argument('-d', '--display-counts', help='display counts',
+    parser.add_argument('-d', '--display-numbers', help='display numbers',
                         action='store_true')
     parser.add_argument('-l', '--logarithmic', help='use logarithm of counts',
                         action='store_true')
@@ -183,7 +183,7 @@ def main():
     ani = animation.FuncAnimation(
             fig=fig,
             func=animfun,
-            fargs=(spiketrains, ticks, args.display_counts, connected,
+            fargs=(spiketrains, ticks, args.display_numbers, connected,
                    args.logarithmic, args.time),
             cache_frame_data=False,
             interval=1)
