@@ -105,10 +105,8 @@ def make_axis(ax, neuron_ids, index, time, logarithmic, is_last):
     if is_last:
         ax.set_xlabel('%d msec' % time)
 
+def parse_args():
 
-def main():
-
-    # Parse command-line arguments
     parser = argparse.ArgumentParser(
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-a', '--address', help='address (IP or MAC)',
@@ -123,7 +121,14 @@ def main():
                         action='store_true')
     parser.add_argument('-t', '--time', type=int, default=1000,
                         help='Time span in milliseconds')
-    args = parser.parse_args()
+
+    return parser.parse_args()
+
+
+def main():
+
+    # Parse command-line arguments
+    args = parse_args()
 
     # Get desired neuron IDs to plot from command line
     neuron_ids = args.ids.strip().split(',')
