@@ -119,7 +119,7 @@ def parse_args():
                         action='store_true')
     parser.add_argument('-l', '--logarithmic', help='use logarithm of counts',
                         action='store_true')
-    parser.add_argument('-t', '--time', type=int, default=1000,
+    parser.add_argument('-s', '--timespan', type=int, default=1000,
                         help='Time span in milliseconds')
 
     return parser.parse_args()
@@ -141,7 +141,7 @@ def main():
 
         for k, ax in enumerate(axes):
 
-            make_axis(ax, neuron_ids, k, args.time, args.logarithmic,
+            make_axis(ax, neuron_ids, k, args.timespan, args.logarithmic,
                       k == len(axes)-1)
 
         # Make list of spike-train info
@@ -189,7 +189,7 @@ def main():
             fig=fig,
             func=animfun,
             fargs=(spiketrains, ticks, args.display_numbers, connected,
-                   args.logarithmic, args.time),
+                   args.logarithmic, args.timespan),
             cache_frame_data=False,
             interval=1)
 
