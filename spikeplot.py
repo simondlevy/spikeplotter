@@ -117,7 +117,7 @@ def main():
     parser.add_argument('-i', '--ids', help='neuron ids')
     parser.add_argument('-v', '--video', help='video file to save',
                         default=None)
-    parser.add_argument('-d', '--display-numbers', help='display numbers',
+    parser.add_argument('-n', '--display-numbers', help='display numbers',
                         action='store_true')
     parser.add_argument('-l', '--logarithmic', help='use logarithm of counts',
                         action='store_true')
